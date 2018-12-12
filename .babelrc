@@ -1,19 +1,11 @@
 {
   "presets": [
-      [ "env",
-          {
-              "modules": false,
-              "useBuiltIns": "usage"
-          }
-      ],
-      "react",
-      "jest"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
-  "env": {
-      "test": {
-          "presets": ["react"],
-          "plugins": ["transform-es2015-modules-commonjs"]
-      }
-
-  }
+  "plugins": [
+    [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  ]
 }

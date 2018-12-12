@@ -1,45 +1,66 @@
-const dev = process.env.NODE_ENV !== "production";
-const path = require( "path" );
-const { BundleAnalyzerPlugin } = require( "webpack-bundle-analyzer" );
-const FriendlyErrorsWebpackPlugin = require( "friendly-errors-webpack-plugin" );
-
-const plugins = [
-    new FriendlyErrorsWebpackPlugin(),
-];
-
-if ( !dev ) {
-    plugins.push( new BundleAnalyzerPlugin( {
-        analyzerMode: "static",
-        reportFilename: "webpack-report.html",
-        openAnalyzer: false,
-    } ) );
-}
+const webpack = require('webpack');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: dev ? "development" : "production",
-    context: path.join( __dirname, "src" ),
-    devtool: dev ? "none" : "source-map",
-    entry: {
-        app: "./client",
-    },
-    resolve: {
-        modules: [
-            path.resolve( "./src" ),
-            "node_modules",
-        ],
-    },
-    module: {
-        rules: [
-            {
-                test: /\.jsx?$/,
-                exclude: /(node_modules|bower_components)/,
-                loader: "babel-loader",
+  resolve: {
+    extensions: ['*', '.js', '.jsx'],
+  },
+  entry: ['babel-polyfill', './src/client'],
+  target: 'web',
+  output: {
+    publicPath: '/',
+    filename: '[name].js',
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebPackPlugin({
+      template: './public/index.html',
+      filename: './index.html',
+    }),
+  ],
+  devServer: {
+    contentBase: './public',
+    hot: true,
+    historyApiFallback: true,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['babel-loader'],
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 10000,
+              mimetype: 'image/svg+xml',
             },
+          },
         ],
-    },
-    output: {
-        path: path.resolve( __dirname, "dist" ),
-        filename: "[name].bundle.js",
-    },
-    plugins,
+      },
+      {
+        test: /\.(jpe?g|png|gif|ico)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+            },
+          },
+        ],
+      },
+    ],
+  },
 };

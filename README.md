@@ -3,12 +3,12 @@ A baseline for server side rendering for your React application. This repo has a
 
 ## Getting started
 Clone the repo with
-```git clone https://github.com/alexnm/react-ssr```
+```git clone https://github.com/iamalisajid/react-ssr```
 
 Install dependencies with
 ```npm i```
 
 Run dev mode with
-```npm run dev```
+```npm start```
 
-Now open the browser and navigate to `http://localhost:2048` and you get your server rendered React app.
+Now open the browser and navigate to `http://localhost:8080` and you get your server rendered React app.

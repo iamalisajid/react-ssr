@@ -1,20 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter as Router} from 'react-router-dom';
-import {Provider as ReduxProvider} from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 
-import Layout from '../components/Layout';
-import createStore from '../store';
+import App from '../viewes/App';
+import configureStore, { persistor } from '../store';
 
-const store = createStore(window.REDUX_DATA);
+const store = configureStore(window.REDUX_DATA);
 
 const jsx = (
-  <ReduxProvider store={ store }>
-    <Router>
-      <Layout/>
-    </Router>
-  </ReduxProvider>
+  <Provider store={store}>
+    <PersistGate persistor={persistor}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
 );
 
-const app = document.getElementById('app');
+const app = document.getElementById('root');
 ReactDOM.hydrate(jsx, app);

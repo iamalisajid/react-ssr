@@ -1,41 +1,33 @@
-import {createStore, combineReducers, applyMiddleware} from 'redux';
-import thunkMiddleware from 'redux-thunk';
-import {fetchCircuits} from '../api';
+import { createStore, applyMiddleware } from 'redux';
+import createSagaMiddleware from 'redux-saga';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import rootReducer from '../reducers/index';
+import rootSaga from '../config/rootSagas';
 
-export const initializeSession = () => ({
-  type: 'INITIALIZE_SESSION',
-});
+const sagaMiddleware = createSagaMiddleware();
 
-const storeData = (data) => ({
-  type: 'STORE_DATA',
-  data,
-});
-
-export const fetchData = () => (dispatch) =>
-  fetchCircuits().then(res => dispatch(storeData(res)));
-
-const sessionReducer = (state = false, action) => {
-  switch (action.type) {
-    case 'INITIALIZE_SESSION':
-      return true;
-    default:
-      return state;
-  }
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['login', 'theme'],
 };
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const dataReducer = (state = [], action) => {
-  switch (action.type) {
-    case 'STORE_DATA':
-      return action.data;
-    default:
-      return state;
-  }
+const middlewares = [sagaMiddleware];
+
+export const getStore = createStore(
+  persistedReducer,
+  composeWithDevTools(applyMiddleware(...middlewares))
+);
+
+sagaMiddleware.run(rootSaga);
+
+export const persistor = persistStore(getStore);
+
+export default () => {
+  const store = getStore;
+  sagaMiddleware.run(rootSaga);
+  return store;
 };
-
-const reducer = combineReducers({
-  loggedIn: sessionReducer,
-  data: dataReducer,
-});
-
-export default (initialState) =>
-  createStore(reducer, initialState, applyMiddleware(thunkMiddleware));
